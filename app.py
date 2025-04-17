@@ -1,3 +1,8 @@
+import os
+os.environ["TRANSFORMERS_NO_TF"] = "1"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
 from flask import Flask, render_template, jsonify
 import subprocess, sys, os
 from pyspark.sql import SparkSession
@@ -5,6 +10,9 @@ from pyspark.sql.functions import col, udf
 from pyspark.sql.types import StringType
 import joblib
 import time
+
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, TextClassificationPipeline
+import torch
 
 app = Flask(__name__)
 
@@ -16,17 +24,53 @@ spark = SparkSession.builder \
 spark.sparkContext.setLogLevel("ERROR")
 
 # Model yuklenir, broadcast edilir
-model = joblib.load("logreg_sentiment140_model.pkl")
-bmodel = spark.sparkContext.broadcast(model)
+# model = joblib.load("logreg_sentiment140_model.pkl")
+# bmodel = spark.sparkContext.broadcast(model)
+
+model_dir = "sentiment_BERT"   # modele ait dosyalar bu klasorde bulunmaktadir
+tokenizer = AutoTokenizer.from_pretrained(model_dir)
+hf_model  = AutoModelForSequenceClassification.from_pretrained(model_dir)
+
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda")
+device = torch.device("cpu")
+hf_model.to(device)
+
+# pipeline hazirlanir, broadcast edilir
+# TextClassificationPipeline hem tokenizasyonu hem model cagrisini kapsadigi icin 
+# UDF icinde tek satirda kullanimi kolaylastirir.
+pipeline = TextClassificationPipeline(model=hf_model, tokenizer=tokenizer, device=0 if device.type=="cuda" else -1)
+bpipe = spark.sparkContext.broadcast(pipeline)
 
 # Prediction UDF'i
-def predict_sentiment(text):
+# def predict_sentiment(text):
+#     try:
+#         p = bmodel.value.predict([text])[0]
+#         return "Positive" if p == 1 else "Negative"
+#     except:
+#         return ""
+# predict_udf = udf(predict_sentiment, StringType())
+
+
+
+def predict_sentiment(text: str) -> str:
     try:
-        p = bmodel.value.predict([text])[0]
-        return "Positive" if p == 1 else "Negative"
-    except:
+        # pipeline(text) -> [{'label': 'LABEL_1', 'score': 0.98}]
+        result = bpipe.value(text)[0]
+        label  = result['label']
+        # “LABEL_0” negatif, “LABEL_1” pozitif
+        if label.endswith("0"):
+            return "Negative"
+        else:
+            return "Positive"
+    except Exception:
         return ""
+
 predict_udf = udf(predict_sentiment, StringType())
+
+
+
+
 
 # Global state
 predictions = {}
@@ -127,3 +171,4 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
+

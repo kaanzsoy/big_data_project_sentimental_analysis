@@ -13,11 +13,11 @@ kafka_2.12-3.5.0/        # Kafka distribution
 static/
   └── style.css         # CSS for the web UI
 templates/
-  └── index.html        # HTML template
-app.py                  # Flask + Spark + Kafka integration
-scraper.py              # Selenium scraper & Kafka producer
-logreg_sentiment140_model.pkl  # Pre-trained sentiment model
-README.md               # This file
+  └── index.html                # HTML template
+app.py                          # Flask + Spark + Kafka integration
+scraper.py                      # Selenium scraper & Kafka producer
+logreg_sentiment140_model.pkl   # Pre-trained sentiment model
+README.md                       # This file
 ```
 
 ## Prerequisites

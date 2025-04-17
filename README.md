@@ -2,7 +2,7 @@
 
 A real-time web application that scrapes tweets via Selenium, streams them into Kafka, processes them with Apache Spark, and performs sentiment prediction using a pre-trained logistic regression model.
 
-## 🚀 Project Structure
+## Project Structure
 
 ```
 kafka_2.12-3.5.0/        # Kafka distribution
@@ -20,7 +20,7 @@ logreg_sentiment140_model.pkl  # Pre-trained sentiment model
 README.md               # This file
 ```
 
-## 🔧 Prerequisites
+## Prerequisites
 
 - Java 8+ (for Spark & Kafka)
 - Kafka & Zookeeper
@@ -33,7 +33,7 @@ README.md               # This file
 pip install flask pyspark kafka-python selenium webdriver-manager joblib
 ```
 
-## ⚙️ Setup & Run
+## Setup & Run
 
 1. **Start Zookeeper & Kafka**
 
@@ -82,7 +82,7 @@ pip install flask pyspark kafka-python selenium webdriver-manager joblib
    - **Stop Fetching Tweets** stops the scraper process.
    - **Start Prediction** stops scraping, consumes all tweets from the topic, runs sentiment prediction, and displays results.
 
-## 🔍 How It Works
+## How It Works
 
 - `scraper.py`: Uses Selenium to scroll through Twitter search results (`x.com`) and produces tweet text messages into Kafka topic `tweets`.
 - `app.py`:
@@ -95,13 +95,10 @@ pip install flask pyspark kafka-python selenium webdriver-manager joblib
     - `/get_tweets` &rarr; returns a JSON list of `{ tweet, prediction }`
 - `index.html` + `style.css`: A simple UI with controls and a live table that polls `/get_tweets` every 2 seconds, animates new rows, and color‑codes predictions.
 
-## 🎨 UI Flow
+## UI Flow
 
 1. **Fetch Tweets** &rarr; begins scraping & streaming to Kafka, table updates live.
 2. **Stop Fetching Tweets** &rarr; stops scraper but table continues polling Kafka for completeness.
 3. **Start Prediction** &rarr; stops polling (optionally), runs batch prediction over all messages, updates table cells with sentiment.
-
----
-
-> **Tip:** To suppress Spark WARN logs, you can set `spark.sparkContext.setLogLevel("ERROR")` in `app.py`, and/or provide a custom `log4j.properties` to reduce noise.
+4. 
 

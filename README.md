@@ -99,6 +99,5 @@ pip install flask pyspark kafka-python selenium webdriver-manager joblib
 
 1. **Fetch Tweets** &rarr; begins scraping & streaming to Kafka, table updates live.
 2. **Stop Fetching Tweets** &rarr; stops scraper but table continues polling Kafka for completeness.
-3. **Start Prediction** &rarr; stops polling (optionally), runs batch prediction over all messages, updates table cells with sentiment.
-4. 
+3. **Start Prediction** &rarr; stops polling (optionally), runs batch prediction over all messages, updates table cells with sentiment. 
 

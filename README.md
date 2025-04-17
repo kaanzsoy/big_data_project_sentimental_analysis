@@ -4,6 +4,9 @@ A real-time web application that scrapes tweets via Selenium, streams them into 
 
 ## Project Structure
 
+> **Note:** The `sentiment_BERT/` directory contains large model files (≈420 MB) and is **not** included in this repository.  
+> Please download it manually before running the app. (https://drive.google.com/drive/folders/1RqGCpUjVUT0-F05LE1pulAeueogXflrS)
+
 ```
 kafka_2.12-3.5.0/               # Kafka distribution
 ├── bin/                        # Kafka CLI scripts
@@ -16,7 +19,7 @@ templates/
   └── index.html                # HTML template
 app.py                          # Flask + Spark + Kafka integration
 scraper.py                      # Selenium scraper & Kafka producer
-sentiment_BERT/                 # Download from: https://drive.google.com/drive/folders/1RqGCpUjVUT0-F05LE1pulAeueogXflrS
+sentiment_BERT/                 
 ├── config.json                        
 ├── model.safetensors
 ├── special_tokens_map.json

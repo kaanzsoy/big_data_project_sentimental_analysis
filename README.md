@@ -16,6 +16,13 @@ templates/
   └── index.html                # HTML template
 app.py                          # Flask + Spark + Kafka integration
 scraper.py                      # Selenium scraper & Kafka producer
+sentiment_BERT/
+├── config.json                        
+├── model.safetensors
+├── special_tokens_map.json
+├── tokenizer_config.json
+├── training_args.bin
+└── vocab.txt
 logreg_sentiment140_model.pkl   # Pre-trained sentiment model
 README.md                       # This file
 ```

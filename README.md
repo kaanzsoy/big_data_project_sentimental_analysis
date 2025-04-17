@@ -5,13 +5,13 @@ A real-time web application that scrapes tweets via Selenium, streams them into 
 ## Project Structure
 
 ```
-kafka_2.12-3.5.0/        # Kafka distribution
-├── bin/                 # Kafka CLI scripts
+kafka_2.12-3.5.0/               # Kafka distribution
+├── bin/                        # Kafka CLI scripts
 ├── config/
 ├── libs/
 ├── ...
 static/
-  └── style.css         # CSS for the web UI
+  └── style.css                 # CSS for the web UI
 templates/
   └── index.html                # HTML template
 app.py                          # Flask + Spark + Kafka integration

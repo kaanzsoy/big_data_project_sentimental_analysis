@@ -16,7 +16,7 @@ templates/
   └── index.html                # HTML template
 app.py                          # Flask + Spark + Kafka integration
 scraper.py                      # Selenium scraper & Kafka producer
-sentiment_BERT/
+sentiment_BERT/                 # Download from: https://drive.google.com/drive/folders/1RqGCpUjVUT0-F05LE1pulAeueogXflrS
 ├── config.json                        
 ├── model.safetensors
 ├── special_tokens_map.json

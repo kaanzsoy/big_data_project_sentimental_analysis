@@ -1,0 +1,6 @@
+[2025-04-17 11:03:15,368] INFO [Controller id=0] Processing automatic preferred replica leader election (kafka.controller.KafkaController)
+[2025-04-17 11:03:15,368] TRACE [Controller id=0] Checking need to trigger auto leader balancing (kafka.controller.KafkaController)
+[2025-04-17 11:08:15,369] INFO [Controller id=0] Processing automatic preferred replica leader election (kafka.controller.KafkaController)
+[2025-04-17 11:08:15,369] TRACE [Controller id=0] Checking need to trigger auto leader balancing (kafka.controller.KafkaController)
+[2025-04-17 11:13:15,370] INFO [Controller id=0] Processing automatic preferred replica leader election (kafka.controller.KafkaController)
+[2025-04-17 11:13:15,377] TRACE [Controller id=0] Checking need to trigger auto leader balancing (kafka.controller.KafkaController)

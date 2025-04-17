@@ -23,7 +23,7 @@ bmodel = spark.sparkContext.broadcast(model)
 def predict_sentiment(text):
     try:
         p = bmodel.value.predict([text])[0]
-        return "Olumlu" if p == 1 else "Olumsuz"
+        return "Positive" if p == 1 else "Negative"
     except:
         return ""
 predict_udf = udf(predict_sentiment, StringType())
@@ -67,9 +67,9 @@ def fetch_tweets():
     if scraper_proc is None or scraper_proc.poll() is not None:
         script = os.path.join(os.path.dirname(__file__), "scraper.py")
         scraper_proc = subprocess.Popen([sys.executable, script])
-        return jsonify({"status": "Tweet çekme işlemi başlatıldı."})
+        return jsonify({"status": "Tweet cekme islemi baslatildi."})
     else:
-        return jsonify({"status": "Tweet çekme zaten çalışıyor."})
+        return jsonify({"status": "Tweet cekme zaten calisiyor."})
 
 # scraper.py calismasini durdur
 @app.route('/stop_fetch', methods=['POST'])
@@ -79,7 +79,7 @@ def stop_fetch():
     # Geride kalan tweetleri al
     all_tweets = read_all_tweets()
     result = [{"tweet": t, "prediction": predictions.get(t, "")} for t in all_tweets]
-    return jsonify({"status": "Tweet çekme işlemi durduruldu.", "tweets": result})
+    return jsonify({"status": "Tweet cekme islemi durduruldu.", "tweets": result})
 
 # her bir tweet icin prediction baslat
 # Kafka topic'inden okuma islemi gerceklestirilir.
@@ -107,7 +107,7 @@ def start_prediction():
     for row in res_df.dropDuplicates(['tweet_text']).collect():
         predictions[row['tweet_text']] = row['prediction']
 
-    return jsonify({"status": "Prediction tamamlandı.", "tweet_count": len(predictions)})
+    return jsonify({"status": "Prediction tamamlandi.", "tweet_count": len(predictions)})
 
 # tweet listesi ve prediction sonuclarinin arayuzde gorunmesi saglanir
 @app.route('/get_tweets')

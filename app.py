@@ -51,8 +51,6 @@ bpipe = spark.sparkContext.broadcast(pipeline)
 #         return ""
 # predict_udf = udf(predict_sentiment, StringType())
 
-
-
 def predict_sentiment(text: str) -> str:
     try:
         # pipeline(text) -> [{'label': 'LABEL_1', 'score': 0.98}]
@@ -67,10 +65,6 @@ def predict_sentiment(text: str) -> str:
         return ""
 
 predict_udf = udf(predict_sentiment, StringType())
-
-
-
-
 
 # Global state
 predictions = {}

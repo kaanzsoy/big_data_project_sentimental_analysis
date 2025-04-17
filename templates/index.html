@@ -1,73 +1,95 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tweet Sentiment Prediction</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #333; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        #status { margin-top: 10px; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tweet Sentiment Prediction</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+  <div class="container">
     <h1>Tweet Sentiment Prediction</h1>
-    <button id="predictBtn">Prediction Başlat</button>
-    <div id="status"></div>
-    <div id="tweetContainer">
-        <table id="tweetTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Tweet</th>
-                    <th>Prediction</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+    <div class="controls">
+      <button id="fetchBtn">Fetch Tweets</button>
+      <button id="stopFetchBtn">Stop Fetching Tweets</button>
+      <button id="predictBtn">Start Prediction</button>
     </div>
+    <div id="status"></div>
+  </div>
 
-    <script>
-        const predictBtn = document.getElementById('predictBtn');
-        const statusDiv = document.getElementById('status');
-        const tableBody = document.querySelector('#tweetTable tbody');
+  <div class="table-container">
+    <table id="tweetTable">
+      <thead>
+        <tr><th>#</th><th>Tweet</th><th>Prediction</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-        async function startPrediction() {
-            statusDiv.textContent = 'Tahmin çalışıyor...';
-            try {
-                const res = await fetch('/start_prediction', { method: 'POST' });
-                const data = await res.json();
-                statusDiv.textContent = `Prediction tamamlandı. Toplam tweet: ${data.tweet_count}`;
-                loadTweets();
-            } catch (err) {
-                statusDiv.textContent = 'Prediction sırasında hata oluştu.';
-                console.error(err);
-            }
+  <script>
+    const fetchBtn = document.getElementById('fetchBtn');
+    const stopFetchBtn = document.getElementById('stopFetchBtn');
+    const predictBtn = document.getElementById('predictBtn');
+    const statusDiv = document.getElementById('status');
+    const tbody = document.querySelector('#tweetTable tbody');
+    let fetchInterval;
+
+    async function loadTweets() {
+      try {
+        const res = await fetch('/get_tweets');
+        const list = await res.json();
+        for (let i = list.length - 1; i >= 0; i--) {
+          const item = list[i];
+          let existing = Array.from(tbody.children)
+                              .find(r => r.cells[1].textContent === item.tweet);
+          const cls = item.prediction === 'Positive' ? 'positive'
+                     : item.prediction === 'Negative' ? 'negative' : '';
+          if (existing) {
+            existing.cells[1].className = cls;
+            const predCell = existing.cells[2];
+            predCell.textContent = item.prediction || '';
+            predCell.className = cls;
+          } else {
+            const tr = document.createElement('tr');
+            tr.classList.add('fade-in');
+            tr.innerHTML = `
+              <td></td>
+              <td class="${cls}">${item.tweet}</td>
+              <td class="${cls}">${item.prediction || ''}</td>
+            `;
+            tbody.insertBefore(tr, tbody.firstChild);
+          }
         }
+        Array.from(tbody.children).forEach((r, i) => r.children[0].textContent = i+1);
+      } catch(e) {
+        console.error(e);
+      }
+    }
 
-        async function loadTweets() {
-            try {
-                const res = await fetch('/get_tweets');
-                const list = await res.json();
-                tableBody.innerHTML = '';
-                list.forEach((item, idx) => {
-                    const row = document.createElement('tr');
-                    const numCell = document.createElement('td'); numCell.textContent = idx + 1;
-                    const tweetCell = document.createElement('td'); tweetCell.textContent = item.tweet;
-                    const predCell = document.createElement('td'); predCell.textContent = item.prediction;
-                    row.append(numCell, tweetCell, predCell);
-                    tableBody.appendChild(row);
-                });
-            } catch (err) {
-                console.error('Tweet yüklenirken hata:', err);
-            }
-        }
+    async function startFetch() {
+      clearInterval(fetchInterval);
+      statusDiv.textContent = 'Fetching tweets...';
+      await fetch('/fetch_tweets',{method:'POST'});
+      tbody.innerHTML = '';
+      fetchInterval = setInterval(loadTweets,2000);
+    }
 
-        predictBtn.addEventListener('click', startPrediction);
-    </script>
+    async function stopFetch() {
+      statusDiv.textContent = '	Tweet fetching stopped.';
+      await fetch('/stop_fetch',{method:'POST'});
+      // polling continues even after stop
+    }
+
+    async function startPrediction() {
+      statusDiv.textContent = '	Running prediction...';
+      await fetch('/start_prediction',{method:'POST'});
+      statusDiv.textContent = 'Prediction completed.';
+      loadTweets();
+    }
+
+    fetchBtn.addEventListener('click', startFetch);
+    stopFetchBtn.addEventListener('click', stopFetch);
+    predictBtn.addEventListener('click', startPrediction);
+  </script>
 </body>
 </html>

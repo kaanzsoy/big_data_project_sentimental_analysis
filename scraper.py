@@ -14,6 +14,10 @@ producer = KafkaProducer(
 )
 
 search_url = "https://x.com/search?q=from%3Acnni&src=typed_query"
+# TechCrunch
+# BBCWorld
+# cnni
+
 
 options = webdriver.ChromeOptions()
 options.add_argument("user-data-dir=/home/kaan/.config/selenium-profile")
@@ -30,7 +34,7 @@ time.sleep(3)
 body = browser.find_element(By.TAG_NAME, "body")
 seen = set()
 
-print("Tweet çekimi başlatıldı... Durdurmak için Ctrl + C")
+print("Tweet cekimi baslatildi. Durdurmak icin Ctrl + C")
 
 with open("tweets.txt", "w", encoding="utf-8") as file:
     try:
@@ -46,21 +50,19 @@ with open("tweets.txt", "w", encoding="utf-8") as file:
                     ).text.strip()
                     if text and text not in seen:
                         seen.add(text)
-                        # Dosyaya yaz (iki satır boşluklu)
+
                         file.write(text + "\n\n")
                         file.flush()
 
-                        # Kafka'ya gönder (mesajın sonuna iki yeni satır ekliyoruz)
+                        # kafka'ya yaz
                         message = text + "\n\n"
                         producer.send('tweets', message)
                         producer.flush()
-
-                        print(f"{text}\n")
                 except:
                     continue
     except KeyboardInterrupt:
-        print("\nTweet çekimi manuel olarak durduruldu.")
-        print(f"Toplam tweet sayısı: {len(seen)}")
+        print("\nTweet cekimi manuel olarak durduruldu.")
+        print(f"Toplam tweet sayisi: {len(seen)}")
 
 browser.quit()
 producer.flush()
